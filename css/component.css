@@ -1,0 +1,619 @@
+/* =========================================
+   1. NAVIGATION INTERACTIONS
+========================================= */
+
+.nav-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-item:active {
+    transform: scale(0.98);
+}
+
+
+/* =========================================
+   2. BUTTON INTERACTIONS
+========================================= */
+
+.upload-button:active,
+.change-video-button:active {
+    transform: scale(0.97);
+}
+
+
+/* =========================================
+   3. KEYBOARD ACCESSIBILITY
+========================================= */
+
+button:focus-visible,
+a:focus-visible,
+label:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 4px;
+}
+
+
+/* =========================================
+   4. VIDEO COMPONENT
+========================================= */
+
+.video-preview video {
+    display: block;
+}
+
+.video-information {
+    min-width: 0;
+}
+
+#selected-file-name {
+    overflow-wrap: anywhere;
+}
+
+
+/* =========================================
+   5. THEME SWITCH
+========================================= */
+
+.theme-switch input:checked + .theme-slider {
+    box-shadow: 0 0 8px rgba(57, 120, 213, 0.25);
+}
+
+
+/* =========================================
+   6. STATUS INDICATORS
+========================================= */
+
+.status-indicator {
+    flex-shrink: 0;
+}
+
+
+/* =========================================
+   7. IMAGE HANDLING
+========================================= */
+
+.sidebar-branding img {
+    flex-shrink: 0;
+}
+
+
+/* ==========================================
+   BACKEND VIDEO INPUT SECTION
+========================================== */
+
+.video-input-section {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+}
+
+#start-monitoring-btn {
+    padding: 12px 38px;
+    border: none;
+    border-radius: 12px;
+    background: #eaf2ff;
+    color: #2864b4;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow:
+        5px 5px 10px #c5d2e3,
+        -5px -5px 10px #ffffff;
+    transition: 0.3s ease;
+}
+
+#start-monitoring-btn:hover {
+    transform: translateY(-2px);
+}
+
+#monitoring-instruction {
+    margin: 0;
+    color: #7185a3;
+    font-size: 14px;
+    text-align: center;
+}
+
+#backend-video {
+    width: 100%;
+    max-width: 700px;
+    max-height: 100%;
+    border-radius: 12px;
+    object-fit: contain;
+}
+
+#backend-video[hidden] {
+    display: none;
+}
+
+/* Monitoring stopped - red status indicator */
+.monitoring-status .status-indicator.inactive {
+    background-color: #e53935;
+    box-shadow: 0 0 8px rgba(229, 57, 53, 0.4);
+}
+
+
+/* Monitoring stopped - red status */
+.monitoring-status.monitoring-inactive {
+    color: #e53935;
+}
+
+.monitoring-status.monitoring-inactive .status-indicator {
+    background-color: #e53935;
+    box-shadow: 0 0 8px rgba(229, 57, 53, 0.4);
+}
+
+/* ==========================================
+   STOP MONITORING BUTTON
+========================================== */
+
+#stop-monitoring-btn {
+    padding: 9px 20px;
+    border: none;
+    border-radius: 10px;
+    background: #ffe8e8;
+    color: #e53935;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow:
+        4px 4px 8px #d8caca,
+        -4px -4px 8px #ffffff;
+    transition: 0.3s ease;
+}
+
+#stop-monitoring-btn:hover {
+    background: #e53935;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+#stop-monitoring-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#stop-monitoring-btn[hidden] {
+    display: none;
+}
+
+/* ==========================================
+   TRAFFIC ANALYTICS DASHBOARD
+========================================== */
+
+.traffic-analytics {
+    width: 100%;
+    margin-top: 35px;
+    padding: 25px;
+    border-radius: 20px;
+    background: #eaf0f8;
+    box-shadow:
+        7px 7px 15px #cbd5e2,
+        -7px -7px 15px #ffffff;
+}
+
+/* Analytics Header */
+
+.analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.analytics-header h2 {
+    color: #243b5a;
+    font-size: 24px;
+    margin: 0 0 7px;
+}
+
+.analytics-header p {
+    color: #8292aa;
+    font-size: 13px;
+    margin: 0;
+}
+
+.analytics-period {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 15px;
+    border-radius: 10px;
+    color: #5276a7;
+    font-size: 12px;
+    background: #eaf0f8;
+    box-shadow:
+        inset 3px 3px 6px #cbd5e2,
+        inset -3px -3px 6px #ffffff;
+}
+
+.period-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e5a33a;
+}
+
+
+/* Overview Cards */
+
+.analytics-overview {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.analytics-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 0;
+    padding: 20px;
+    border-radius: 16px;
+    background: #eaf0f8;
+    box-shadow:
+        6px 6px 12px #cbd5e2,
+        -6px -6px 12px #ffffff;
+}
+
+.analytics-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    font-size: 21px;
+    background: #eaf0f8;
+    box-shadow:
+        inset 3px 3px 6px #cbd5e2,
+        inset -3px -3px 6px #ffffff;
+}
+
+.analytics-card p {
+    margin: 0 0 7px;
+    color: #7e8fa8;
+    font-size: 12px;
+}
+
+.analytics-card h3 {
+    margin: 0 0 5px;
+    color: #29496f;
+    font-size: 23px;
+}
+
+.analytics-card span {
+    color: #9aa8bb;
+    font-size: 11px;
+}
+
+
+/* Analytics Charts Layout */
+
+.analytics-charts {
+    display: grid;
+    grid-template-columns: 0.85fr 1.5fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.analytics-panel {
+    min-width: 0;
+    padding: 22px;
+    border-radius: 17px;
+    background: #eaf0f8;
+    box-shadow:
+        6px 6px 12px #cbd5e2,
+        -6px -6px 12px #ffffff;
+}
+
+.panel-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.panel-heading h3 {
+    margin: 0 0 6px;
+    color: #29496f;
+    font-size: 16px;
+}
+
+.panel-heading p {
+    margin: 0;
+    color: #91a0b5;
+    font-size: 11px;
+}
+
+.chart-unit {
+    color: #8194af;
+    font-size: 11px;
+}
+
+
+/* Vehicle Distribution */
+
+.distribution-chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 220px;
+    height: 190px;
+    margin: 0 auto 20px;
+}
+
+#vehicle-distribution-chart {
+    width: 100%;
+    height: 100%;
+}
+
+.chart-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.chart-center h3 {
+    margin: 0;
+    color: #29496f;
+    font-size: 22px;
+}
+
+.chart-center span {
+    margin-top: 4px;
+    color: #91a0b5;
+    font-size: 10px;
+}
+
+.chart-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+}
+
+.chart-legend > div {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #72849e;
+    font-size: 12px;
+}
+
+.chart-legend strong {
+    margin-left: auto;
+    color: #385a83;
+}
+
+.legend-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+}
+
+.car-dot {
+    background: #397fc7;
+}
+
+.bike-dot {
+    background: #65b6d8;
+}
+
+.heavy-dot {
+    background: #e5a33a;
+}
+
+
+/* Traffic Flow Chart */
+
+.flow-chart-container {
+    position: relative;
+    width: 100%;
+    height: 260px;
+}
+
+#traffic-flow-chart {
+    width: 100%;
+    height: 100%;
+}
+
+
+/* Bottom Analytics Panels */
+
+.analytics-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+
+/* Traffic Density */
+
+.density-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.density-item {
+    margin-bottom: 23px;
+}
+
+.density-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    color: #71849e;
+    font-size: 12px;
+}
+
+.density-info strong {
+    color: #385a83;
+}
+
+.density-track {
+    width: 100%;
+    height: 10px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #dce5f0;
+    box-shadow: inset 2px 2px 4px #c3cedd;
+}
+
+.density-fill {
+    height: 100%;
+    width: 0;
+    border-radius: 20px;
+    transition: width 0.7s ease;
+}
+
+.low-fill {
+    background: #54b99a;
+}
+
+.medium-fill {
+    background: #e5ad4d;
+}
+
+.high-fill {
+    background: #e36b6b;
+}
+
+
+/* Peak Traffic Hours */
+
+.peak-highlight {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 20px;
+    border-radius: 14px;
+    background: #eaf0f8;
+    box-shadow:
+        inset 4px 4px 8px #cbd5e2,
+        inset -4px -4px 8px #ffffff;
+}
+
+.peak-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    color: #397fc7;
+    font-size: 25px;
+    background: #eaf0f8;
+    box-shadow:
+        4px 4px 8px #cbd5e2,
+        -4px -4px 8px #ffffff;
+}
+
+.peak-highlight span {
+    color: #8b9bb1;
+    font-size: 11px;
+}
+
+.peak-highlight h2 {
+    margin: 5px 0;
+    color: #29496f;
+    font-size: 23px;
+}
+
+.peak-highlight p {
+    margin: 0;
+    color: #8292aa;
+    font-size: 11px;
+}
+
+.peak-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #d6e0ec;
+    color: #8494aa;
+    font-size: 12px;
+}
+
+.peak-footer strong {
+    color: #397fc7;
+}
+
+
+/* Analytics Responsive Layout */
+
+@media (max-width: 1100px) {
+
+    .analytics-overview {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .analytics-charts {
+        grid-template-columns: 1fr 1.3fr;
+    }
+
+}
+
+@media (max-width: 768px) {
+
+    .traffic-analytics {
+        padding: 18px;
+    }
+
+    .analytics-charts,
+    .analytics-bottom {
+        grid-template-columns: 1fr;
+    }
+
+    .analytics-header h2 {
+        font-size: 21px;
+    }
+
+}
+
+@media (max-width: 480px) {
+
+    .analytics-overview {
+        grid-template-columns: 1fr;
+        gap: 13px;
+    }
+
+    .analytics-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .analytics-card {
+        padding: 16px;
+    }
+
+    .analytics-panel {
+        padding: 17px;
+    }
+
+    .flow-chart-container {
+        height: 220px;
+    }
+
+    .peak-highlight {
+        padding: 15px;
+    }
+
+}

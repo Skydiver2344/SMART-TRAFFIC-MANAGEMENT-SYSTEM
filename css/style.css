@@ -1,0 +1,1051 @@
+
+/* =========================================
+   1. GLOBAL VARIABLES
+========================================= */
+
+:root {
+    --primary-color: #3978d5;
+    --primary-dark: #2864bd;
+    --primary-light: #e5efff;
+
+    --background-color: #eaf0f8;
+    --surface-color: #edf2fa;
+
+    --text-primary: #26364d;
+    --text-secondary: #718096;
+
+    --border-color: #d8e1ee;
+
+    --success-color: #28b879;
+    --danger-color: #f05252;
+    --warning-color: #f5b942;
+
+    --shadow-light: #ffffff;
+    --shadow-dark: #cbd5e1;
+
+    --sidebar-width: 250px;
+
+    --border-radius: 18px;
+    --transition: all 0.3s ease;
+}
+
+
+/* =========================================
+   2. RESET AND BASE STYLES
+========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--background-color);
+    color: var(--text-primary);
+    transition: var(--transition);
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+
+/* =========================================
+   3. NEUMORPHIC SHADOWS
+========================================= */
+
+.neu-raised {
+    box-shadow:
+        7px 7px 15px var(--shadow-dark),
+        -7px -7px 15px var(--shadow-light);
+}
+
+.neu-inset {
+    box-shadow:
+        inset 5px 5px 10px var(--shadow-dark),
+        inset -5px -5px 10px var(--shadow-light);
+}
+
+
+/* =========================================
+   4. MAIN APPLICATION LAYOUT
+========================================= */
+
+.app-container {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+
+/* =========================================
+   5. SIDEBAR
+========================================= */
+
+.sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    padding: 30px 20px;
+
+    background: var(--surface-color);
+
+    box-shadow:
+        5px 0 15px rgba(130, 150, 180, 0.12);
+
+    transition: var(--transition);
+    z-index: 100;
+}
+
+
+/* Sidebar Navigation */
+
+.sidebar-navigation {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    padding: 15px 18px;
+
+    border-radius: 14px;
+
+    color: var(--text-secondary);
+    font-size: 15px;
+    font-weight: 600;
+
+    transition: var(--transition);
+}
+
+.nav-item:hover {
+    color: var(--primary-color);
+
+    background: var(--surface-color);
+
+    box-shadow:
+        5px 5px 10px var(--shadow-dark),
+        -5px -5px 10px var(--shadow-light);
+}
+
+.nav-item.active {
+    color: var(--primary-color);
+
+    background: var(--surface-color);
+
+    box-shadow:
+        inset 4px 4px 8px var(--shadow-dark),
+        inset -4px -4px 8px var(--shadow-light);
+}
+
+.nav-icon {
+    font-size: 21px;
+}
+
+
+/* Sidebar Bottom */
+
+.sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+
+/* Theme Toggle */
+
+.sidebar-theme {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 12px 15px;
+
+    border-radius: 12px;
+
+    box-shadow:
+        inset 4px 4px 8px var(--shadow-dark),
+        inset -4px -4px 8px var(--shadow-light);
+}
+
+.theme-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+
+    width: 48px;
+    height: 25px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.theme-slider {
+    position: absolute;
+    inset: 0;
+
+    background: #cbd5e1;
+
+    border-radius: 30px;
+
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.theme-slider::before {
+    content: "";
+
+    position: absolute;
+
+    width: 19px;
+    height: 19px;
+
+    left: 3px;
+    bottom: 3px;
+
+    background: white;
+    border-radius: 50%;
+
+    transition: var(--transition);
+}
+
+.theme-switch input:checked + .theme-slider {
+    background: var(--primary-color);
+}
+
+.theme-switch input:checked + .theme-slider::before {
+    transform: translateX(23px);
+}
+
+
+/* Sidebar Branding */
+
+.sidebar-branding {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 12px;
+}
+
+.sidebar-branding img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+}
+
+.branding-text h3 {
+    font-size: 15px;
+    color: var(--primary-color);
+}
+
+.branding-text p {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 3px;
+}
+
+
+/* =========================================
+   6. MAIN CONTENT
+========================================= */
+
+.main-content {
+    flex: 1;
+    min-width: 0;
+
+    padding: 25px 35px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+
+/* =========================================
+   7. HEADER
+========================================= */
+
+.header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+
+/* Header Branding */
+
+.header-branding {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+
+    min-width: 0;
+}
+
+.header-signal {
+    width: 48px;
+    min-width: 48px;
+    height: 90px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    background: #26364d;
+    border-radius: 14px;
+
+    box-shadow:
+        inset 3px 3px 6px rgba(0, 0, 0, 0.3),
+        3px 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+.signal-light {
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+}
+
+.signal-light.red {
+    background: #e74c4c;
+    box-shadow: 0 0 8px rgba(231, 76, 76, 0.5);
+}
+
+.signal-light.yellow {
+    background: #f1c40f;
+    box-shadow: 0 0 8px rgba(241, 196, 15, 0.5);
+}
+
+.signal-light.green {
+    background: #2ecc71;
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.5);
+}
+
+
+/* Header Title */
+
+.header-title h1 {
+    font-size: clamp(19px, 2vw, 27px);
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--text-primary);
+}
+
+.header-title h1 span {
+    color: var(--primary-color);
+}
+
+.header-title p {
+    margin-top: 7px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+
+/* Header Information */
+
+.header-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 8px;
+    margin-left: auto;
+    width: auto;
+}
+
+.system-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: var(--success-color);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status-indicator {
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: var(--success-color);
+
+    box-shadow:
+        0 0 8px rgba(40, 184, 121, 0.5);
+}
+
+.datetime-container {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.calendar-icon {
+    font-size: 17px;
+}
+
+
+/* Mobile Sidebar Button */
+
+.sidebar-toggle {
+    display: none;
+
+    border: none;
+    background: transparent;
+
+    color: var(--primary-color);
+    font-size: 25px;
+}
+
+
+/* =========================================
+   8. DASHBOARD CONTENT
+========================================= */
+
+.dashboard-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+
+/* =========================================
+   9. TRAFFIC MONITORING SECTION
+========================================= */
+
+.traffic-monitoring {
+    width: 100%;
+
+    padding: 25px;
+
+    border-radius: 22px;
+
+    background: var(--surface-color);
+
+    box-shadow:
+        7px 7px 15px var(--shadow-dark),
+        -7px -7px 15px var(--shadow-light);
+}
+
+
+/* Monitoring Header */
+
+.monitoring-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 15px;
+    margin-bottom: 35px;
+}
+
+.monitoring-title h2 {
+    font-size: 22px;
+    color: var(--text-primary);
+}
+
+.monitoring-title p {
+    margin-top: 7px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.monitoring-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--success-color);
+}
+
+
+/* =========================================
+   10. UNIFIED MONITORING CONTAINER
+========================================= */
+
+.monitoring-container {
+    position: relative;
+
+    width: 100%;
+    min-height: 540px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 55px 80px;
+
+    border-radius: 20px;
+
+    background: var(--surface-color);
+
+    box-shadow:
+        inset 6px 6px 12px var(--shadow-dark),
+        inset -6px -6px 12px var(--shadow-light);
+}
+
+
+/* =========================================
+   11. TRAFFIC SIGNALS
+========================================= */
+
+.traffic-signal {
+    position: absolute;
+
+    width: 65px;
+    height: 125px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 2;
+}
+
+.signal-housing {
+    width: 55px;
+    height: 115px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    border-radius: 15px;
+
+    background: #26364d;
+
+    box-shadow:
+        5px 5px 10px rgba(0, 0, 0, 0.2),
+        inset 2px 2px 5px rgba(255, 255, 255, 0.08);
+}
+
+.light {
+    width: 23px;
+    height: 23px;
+
+    border-radius: 50%;
+
+    background: #596474;
+    opacity: 0.35;
+}
+
+/* Traffic Signal Positions */
+
+.signal-top-left {
+    top: 12px;
+    left: 12px;
+}
+
+.signal-top-right {
+    top: 12px;
+    right: 12px;
+}
+
+.signal-bottom-left {
+    bottom: 12px;
+    left: 12px;
+}
+
+.signal-bottom-right {
+    bottom: 12px;
+    right: 12px;
+}
+
+
+/* Traffic Light Colours */
+
+.light.red {
+    background: #ff4545;
+}
+
+.light.yellow {
+    background: #ffca3a;
+}
+
+.light.green {
+    background: #35d07f;
+}
+
+
+/* Active Traffic Light */
+
+.light.active {
+    opacity: 1;
+}
+
+.light.red.active {
+    box-shadow: 0 0 12px #ff4545;
+}
+
+.light.yellow.active {
+    box-shadow: 0 0 12px #ffca3a;
+}
+
+.light.green.active {
+    box-shadow: 0 0 12px #35d07f;
+}
+
+
+/* =========================================
+   12. VIDEO UPLOAD AREA
+========================================= */
+
+.video-upload-area {
+    width: 100%;
+    max-width: 850px;
+    min-height: 390px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 25px;
+
+    border: 2px dashed #9db7dd;
+    border-radius: 18px;
+
+    background: rgba(224, 235, 250, 0.45);
+
+    transition: var(--transition);
+}
+
+.video-upload-area:hover {
+    border-color: var(--primary-color);
+    background: rgba(218, 232, 252, 0.65);
+}
+
+
+/* Upload Content */
+
+.upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    gap: 13px;
+}
+
+.upload-icon {
+    width: 65px;
+    height: 65px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 18px;
+
+    font-size: 35px;
+    font-weight: 300;
+    color: var(--primary-color);
+
+    background: var(--surface-color);
+
+    box-shadow:
+        5px 5px 10px var(--shadow-dark),
+        -5px -5px 10px var(--shadow-light);
+}
+
+.upload-content h3 {
+    font-size: 20px;
+    color: var(--text-primary);
+}
+
+.upload-content p {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+
+/* Upload Button */
+
+.upload-button {
+    display: inline-block;
+
+    margin-top: 8px;
+    padding: 12px 27px;
+
+    border-radius: 10px;
+
+    background: var(--primary-color);
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow:
+        4px 4px 8px rgba(57, 120, 213, 0.25);
+
+    transition: var(--transition);
+}
+
+.upload-button:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.upload-formats {
+    margin-top: 5px;
+    font-size: 11px ;
+}
+
+
+/* =========================================
+   13. VIDEO PREVIEW
+========================================= */
+
+.video-preview {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.video-preview[hidden],
+.upload-content[hidden] {
+    display: none;
+}
+
+.video-preview video {
+    width: 100%;
+    max-height: 430px;
+
+    border-radius: 12px;
+
+    background: #111;
+    object-fit: contain;
+}
+
+
+/* Video Information */
+
+.video-information {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 15px;
+}
+
+#selected-file-name {
+    max-width: 70%;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+
+/* Change Video Button */
+
+.change-video-button {
+    padding: 10px 18px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: var(--primary-color);
+    color: white;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    transition: var(--transition);
+}
+
+.change-video-button:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+
+/* =========================================
+   14. DARK THEME FOUNDATION
+========================================= */
+
+body.dark-theme {
+    --background-color: #171e2b;
+    --surface-color: #202b3b;
+
+    --text-primary: #e8eef8;
+    --text-secondary: #a0aec0;
+
+    --border-color: #35445a;
+
+    --shadow-light: #2b394d;
+    --shadow-dark: #121925;
+
+    --primary-light: #263d5e;
+}
+
+body.dark-theme .header,
+body.dark-theme .sidebar,
+body.dark-theme .traffic-monitoring {
+    background: var(--surface-color);
+}
+
+body.dark-theme .monitoring-container {
+    background: var(--surface-color);
+}
+
+body.dark-theme .video-upload-area {
+    background: rgba(29, 42, 60, 0.7);
+    border-color: #536f98;
+}
+
+body.dark-theme .video-upload-area:hover {
+    background: rgba(39, 57, 82, 0.8);
+    border-color: var(--primary-color);
+}
+
+body.dark-theme .nav-item:hover,
+body.dark-theme .nav-item.active {
+    background: var(--surface-color);
+}
+
+body.dark-theme .sidebar-theme {
+    background: var(--surface-color);
+}
+
+
+/* =========================================
+   15. GENERAL TRANSITIONS
+========================================= */
+
+.nav-item,
+.upload-button,
+.change-video-button,
+.theme-slider,
+.video-upload-area {
+    transition: var(--transition);
+}
+
+
+/* =========================================
+   UPDATED APPLICATION LAYOUT
+========================================= */
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Full-width header */
+
+.header {
+    width: 100%;
+    min-height: 115px;
+    flex-shrink: 0;
+    border-radius: 0 0 18px 18px;
+    padding: 18px 30px;
+}
+
+/* Application below header */
+
+.app-container {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+}
+
+/* Reduced sidebar width */
+
+:root {
+    --sidebar-width: 220px;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    min-height: 0;
+    height: auto;
+    border-radius: 0;
+}
+
+/* Main content */
+
+.main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 25px 35px;
+}
+
+/* Date and time */
+
+.datetime-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+
+/* =========================================
+   RESTORE PREVIOUS TRAFFIC LIGHT POSITION
+========================================= */
+
+.monitoring-container {
+    position: relative;
+    min-height: 540px;
+    padding: 55px 80px;
+}
+
+/* Common positioning */
+.traffic-signal {
+    position: absolute;
+    z-index: 5;
+    width: 65px;
+    height: 125px;
+}
+
+/* TOP - Horizontal */
+.signal-top-left {
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.signal-top-left .signal-housing {
+    transform: rotate(90deg) scale(0.8);
+}
+
+/* RIGHT - Vertical */
+.signal-top-right {
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+}
+
+/* BOTTOM - Horizontal */
+.signal-bottom-left {
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.signal-bottom-left .signal-housing {
+    transform: rotate(90deg) scale(0.8);
+}
+
+/* LEFT - Vertical */
+.signal-bottom-right {
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+}
+
+
+/* =========================================
+   INNER DOTTED MONITORING BOX
+========================================= */
+
+.monitoring-container {
+    position: relative;
+}
+
+/* Wider central dotted box */
+
+.monitoring-container::before {
+    content: "";
+    position: absolute;
+
+    top: 95px;
+    bottom: 95px;
+
+    left: 10%;
+    right: 10%;
+
+    border: 2px dashed #9db7dd;
+    border-radius: 16px;
+
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Adjust top and bottom traffic lights */
+
+.signal-top-left {
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.signal-bottom-left {
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Maintain horizontal orientation */
+
+.signal-top-left .signal-housing,
+.signal-bottom-left .signal-housing {
+    transform: rotate(90deg) scale(0.8);
+}

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Traffic Analytics - Smart Traffic Management System">
+
+    <title>Traffic Analytics | Smart Traffic Management System</title>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/component.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+    <!-- JavaScript Files -->
+    <script src="js/theme.js" defer></script>
+    <script src="js/script.js" defer></script>
+    <script src="js/analytics.js" defer></script>
+
+</head>
+
+<body>
+
+    <!-- ========== HEADER ========== -->
+    <header class="header">
+
+        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle sidebar">
+            ☰
+        </button>
+
+        <div class="header-branding">
+
+            <div class="header-signal">
+                <span class="signal-light red"></span>
+                <span class="signal-light yellow"></span>
+                <span class="signal-light green"></span>
+            </div>
+
+            <div class="header-title">
+                <h1>
+                    Smart <span>Traffic</span> Management System
+                </h1>
+
+                <p>
+                    AI Powered | Safer Roads | Smoother Journeys
+                </p>
+            </div>
+
+        </div>
+
+        <div class="header-info">
+
+            <div class="system-status">
+                <span class="status-indicator"></span>
+                <span>Traffic System Online</span>
+            </div>
+
+            <div class="datetime-container">
+                <span id="current-date"></span>
+                <span id="current-time"></span>
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- ========== APPLICATION CONTAINER ========== -->
+    <div class="app-container">
+
+        <!-- ========== SIDEBAR ========== -->
+        <aside class="sidebar" id="sidebar">
+
+            <nav class="sidebar-navigation">
+
+                <a href="index.html" class="nav-item">
+                    <span class="nav-icon">▦</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+
+                <a href="traffic-analytics.html" class="nav-item active">
+                    <span class="nav-icon">▥</span>
+                    <span class="nav-text">Traffic Analytics</span>
+                </a>
+
+            </nav>
+
+
+            <!-- Sidebar Bottom -->
+            <div class="sidebar-bottom">
+
+                <div class="sidebar-theme">
+
+                    <span class="theme-label">Theme</span>
+
+                    <label class="theme-switch">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="theme-slider"></span>
+                    </label>
+
+                </div>
+
+                <div class="sidebar-branding">
+
+                    <img
+                        src="assets/images/traffic-logo.png"
+                        alt="Smart Traffic Logo"
+                    >
+
+                    <div class="branding-text">
+                        <h3>Smarter AI</h3>
+                        <p>Better Traffic</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ========== MAIN CONTENT ========== -->
+        <main class="main-content">
+
+            <div class="dashboard-content">
+
+                <!-- ========== TRAFFIC ANALYTICS ========== -->
+                <section class="traffic-analytics" id="analytics">
+
+                    <!-- Analytics Header -->
+                    <div class="analytics-header">
+
+                        <div>
+                            <h2>Traffic Analytics</h2>
+                            <p>Insights and statistics of detected traffic</p>
+                        </div>
+
+                    </div>
+
+
+                    <!-- ========== OVERVIEW CARDS ========== -->
+                    <div class="analytics-overview">
+
+                        <div class="analytics-card">
+
+                            <div class="analytics-card-icon">🚗</div>
+
+                            <div>
+                                <p>Total Vehicles</p>
+                                <h3 id="total-vehicles">1,250</h3>
+                                <span>Vehicles detected</span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="analytics-card">
+
+                            <div class="analytics-card-icon">🚘</div>
+
+                            <div>
+                                <p>Total Cars</p>
+                                <h3 id="total-cars">620</h3>
+                                <span>Cars detected</span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="analytics-card">
+
+                            <div class="analytics-card-icon">🏍️</div>
+
+                            <div>
+                                <p>Total Bikes</p>
+                                <h3 id="total-bikes">410</h3>
+                                <span>Bikes detected</span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="analytics-card">
+
+                            <div class="analytics-card-icon">🚌</div>
+
+                            <div>
+                                <p>Buses & Trucks</p>
+                                <h3 id="total-heavy">220</h3>
+                                <span>Heavy vehicles</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ========== CHARTS SECTION ========== -->
+                    <div class="analytics-charts">
+
+                        <!-- Vehicle Distribution -->
+                        <div class="analytics-panel distribution-panel">
+
+                            <div class="panel-heading">
+
+                                <div>
+                                    <h3>Vehicle Distribution</h3>
+                                    <p>Breakdown by vehicle category</p>
+                                </div>
+
+                            </div>
+
+                            <div class="distribution-chart-container">
+
+                                <canvas id="vehicle-distribution-chart"></canvas>
+
+                                <div class="chart-center">
+                                    <h3 id="distribution-total">1,250</h3>
+                                    <span>Total Vehicles</span>
+                                </div>
+
+                            </div>
+
+                            <div class="chart-legend">
+
+                                <div>
+                                    <span class="legend-dot car-dot"></span>
+                                    Cars
+                                    <strong id="car-percentage">50%</strong>
+                                </div>
+
+                                <div>
+                                    <span class="legend-dot bike-dot"></span>
+                                    Bikes
+                                    <strong id="bike-percentage">33%</strong>
+                                </div>
+
+                                <div>
+                                    <span class="legend-dot heavy-dot"></span>
+                                    Buses & Trucks
+                                    <strong id="heavy-percentage">17%</strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Traffic Flow -->
+                        <div class="analytics-panel flow-panel">
+
+                            <div class="panel-heading">
+
+                                <div>
+                                    <h3>Traffic Flow Over Time</h3>
+                                    <p>Hourly vehicle detection trend</p>
+                                </div>
+
+                                <span class="chart-unit">
+                                    Vehicles / Hour
+                                </span>
+
+                            </div>
+
+                            <div class="flow-chart-container">
+                                <canvas id="traffic-flow-chart"></canvas>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ========== BOTTOM ANALYTICS ========== -->
+                    <div class="analytics-bottom">
+
+                        <!-- Traffic Density -->
+                        <div class="analytics-panel density-panel">
+
+                            <div class="panel-heading">
+
+                                <div>
+                                    <h3>Traffic Density</h3>
+                                    <p>Distribution of congestion levels</p>
+                                </div>
+
+                            </div>
+
+
+                            <div class="density-item">
+
+                                <div class="density-info">
+                                    <span>Low Density</span>
+                                    <strong id="low-density-value">45%</strong>
+                                </div>
+
+                                <div class="density-track">
+                                    <div
+                                        class="density-fill low-fill"
+                                        id="low-density-bar"
+                                    ></div>
+                                </div>
+
+                            </div>
+
+
+                            <div class="density-item">
+
+                                <div class="density-info">
+                                    <span>Medium Density</span>
+                                    <strong id="medium-density-value">35%</strong>
+                                </div>
+
+                                <div class="density-track">
+                                    <div
+                                        class="density-fill medium-fill"
+                                        id="medium-density-bar"
+                                    ></div>
+                                </div>
+
+                            </div>
+
+
+                            <div class="density-item">
+
+                                <div class="density-info">
+                                    <span>High Density</span>
+                                    <strong id="high-density-value">20%</strong>
+                                </div>
+
+                                <div class="density-track">
+                                    <div
+                                        class="density-fill high-fill"
+                                        id="high-density-bar"
+                                    ></div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Peak Traffic Hours -->
+                        <div class="analytics-panel peak-panel">
+
+                            <div class="panel-heading">
+
+                                <div>
+                                    <h3>Peak Traffic Hours</h3>
+                                    <p>Busiest traffic periods</p>
+                                </div>
+
+                            </div>
+
+
+                            <div class="peak-highlight">
+
+                                <div class="peak-icon">⏱</div>
+
+                                <div>
+                                    <span>Busiest Hour</span>
+                                    <h2 id="peak-hour">06:00 PM</h2>
+                                    <p id="peak-vehicles">320 vehicles detected</p>
+                                </div>
+
+                            </div>
+
+
+                            <div class="peak-footer">
+                                <span>Peak traffic period</span>
+                                <strong>Evening</strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </main>
+
+    </div>
+
+</body>
+
+</html>

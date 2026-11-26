@@ -134,7 +134,7 @@
 
                         <div>
                             <h2>Traffic Analytics</h2>
-                            <p>Insights and statistics of detected traffic</p>
+                            <p id="analytics-session-status">Waiting for monitoring session...</p>
                         </div>
 
                     </div>
@@ -187,9 +187,9 @@
                             <div class="analytics-card-icon">🚌</div>
 
                             <div>
-                                <p>Buses & Trucks</p>
-                                <h3 id="total-heavy">220</h3>
-                                <span>Heavy vehicles</span>
+                                <p>Vans, Buses & Trucks</p>
+                                <h3 id="total-heavy">0</h3>
+                                <span>Commercial vehicles</span>
                             </div>
 
                         </div>
@@ -217,7 +217,7 @@
                                 <canvas id="vehicle-distribution-chart"></canvas>
 
                                 <div class="chart-center">
-                                    <h3 id="distribution-total">1,250</h3>
+                                    <h3 id="distribution-total">0</h3>
                                     <span>Total Vehicles</span>
                                 </div>
 
@@ -228,19 +228,19 @@
                                 <div>
                                     <span class="legend-dot car-dot"></span>
                                     Cars
-                                    <strong id="car-percentage">50%</strong>
+                                    <strong id="car-percentage">0%</strong>
                                 </div>
 
                                 <div>
                                     <span class="legend-dot bike-dot"></span>
                                     Bikes
-                                    <strong id="bike-percentage">33%</strong>
+                                    <strong id="bike-percentage">0%</strong>
                                 </div>
 
                                 <div>
                                     <span class="legend-dot heavy-dot"></span>
-                                    Buses & Trucks
-                                    <strong id="heavy-percentage">17%</strong>
+                                    Vans, Buses & Trucks
+                                    <strong id="heavy-percentage">0%</strong>
                                 </div>
 
                             </div>
@@ -255,11 +255,11 @@
 
                                 <div>
                                     <h3>Traffic Flow Over Time</h3>
-                                    <p>Hourly vehicle detection trend</p>
+                                    <p>Unique vehicles detected per 5-second interval</p>
                                 </div>
 
                                 <span class="chart-unit">
-                                    Vehicles / Hour
+                                    Vehicles / Minute
                                 </span>
 
                             </div>
@@ -282,8 +282,7 @@
                             <div class="panel-heading">
 
                                 <div>
-                                    <h3>Traffic Density</h3>
-                                    <p>Distribution of congestion levels</p>
+                                    <p>Based on observed vehicle counts in each lane</p>
                                 </div>
 
                             </div>
@@ -293,7 +292,7 @@
 
                                 <div class="density-info">
                                     <span>Low Density</span>
-                                    <strong id="low-density-value">45%</strong>
+                                    <strong id="low-density-value">0%</strong>
                                 </div>
 
                                 <div class="density-track">
@@ -310,7 +309,7 @@
 
                                 <div class="density-info">
                                     <span>Medium Density</span>
-                                    <strong id="medium-density-value">35%</strong>
+                                    <strong id="medium-density-value">0%</strong>
                                 </div>
 
                                 <div class="density-track">
@@ -327,7 +326,7 @@
 
                                 <div class="density-info">
                                     <span>High Density</span>
-                                    <strong id="high-density-value">20%</strong>
+                                    <strong id="high-density-value">0%</strong>
                                 </div>
 
                                 <div class="density-track">
@@ -348,8 +347,8 @@
                             <div class="panel-heading">
 
                                 <div>
-                                    <h3>Peak Traffic Hours</h3>
-                                    <p>Busiest traffic periods</p>
+                                    <h3>Peak Traffic</h3>
+                                    <p>Busiest period during the session</p>
                                 </div>
 
                             </div>
@@ -357,20 +356,24 @@
 
                             <div class="peak-highlight">
 
+                                <div class="peak-highlight">
+
                                 <div class="peak-icon">⏱</div>
 
                                 <div>
-                                    <span>Busiest Hour</span>
-                                    <h2 id="peak-hour">06:00 PM</h2>
-                                    <p id="peak-vehicles">320 vehicles detected</p>
+                                    <span>Busiest 5-Second Interval</span>
+                                    <h2 id="peak-hour">No data</h2>
+                                    <p id="peak-vehicles">0 vehicles detected</p>
                                 </div>
+
+                            </div>
 
                             </div>
 
 
                             <div class="peak-footer">
-                                <span>Peak traffic period</span>
-                                <strong>Evening</strong>
+                                <span>Measured from</span>
+                                <strong>Video time</strong>
                             </div>
 
                         </div>

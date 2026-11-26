@@ -1049,3 +1049,51 @@ body {
 .signal-bottom-left .signal-housing {
     transform: rotate(90deg) scale(0.8);
 }
+
+/* =========================================
+   LANE LABELS
+========================================= */
+
+.lane-label {
+    position: absolute;
+    z-index: 5;
+
+    padding: 5px 12px;
+
+    background: #397fc7;
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+}
+
+/* L1 - Top */
+.lane-L1 {
+    top: 40px;
+    left: 58%;
+    transform: translateX(-50%);
+}
+
+/* L2 - Right */
+.lane-L2 {
+    top: 65%;
+    right: 20px;
+    transform: translateY(-50%);
+}
+
+/* L3 - Bottom */
+.lane-L3 {
+    bottom: 37px;
+    left: 58%;
+    transform: translateX(-50%);
+}
+
+/* L4 - Left */
+.lane-L4 {
+    top: 65%;
+    left: 20px;
+    transform: translateY(-50%);
+}

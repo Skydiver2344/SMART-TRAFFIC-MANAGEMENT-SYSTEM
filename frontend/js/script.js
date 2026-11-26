@@ -42,7 +42,6 @@
     const sidebar = document.getElementById('sidebar');
 
     function initSidebar() {
-
         if (!menuToggle || !sidebar) return;
 
         menuToggle.addEventListener('click', function (e) {
@@ -51,7 +50,6 @@
         });
 
         document.addEventListener('click', function (e) {
-
             if (
                 sidebar.classList.contains('sidebar-open') &&
                 !sidebar.contains(e.target) &&
@@ -59,7 +57,6 @@
             ) {
                 sidebar.classList.remove('sidebar-open');
             }
-
         });
 
         const navItems = document.querySelectorAll(
@@ -67,9 +64,7 @@
         );
 
         navItems.forEach(item => {
-
             item.addEventListener('click', function () {
-
                 navItems.forEach(nav => nav.classList.remove('active'));
 
                 this.classList.add('active');
@@ -77,104 +72,110 @@
                 if (window.innerWidth <= 768) {
                     sidebar.classList.remove('sidebar-open');
                 }
-
             });
-
         });
-
     }
 
     // ==========================================
-    // 3. TRAFFIC SIGNAL CONTROLLER
+    // 3. BACKEND TRAFFIC SIGNAL CONTROLLER
     // ==========================================
 
-    const signalTopLeft = document.querySelector('.signal-top-left');
-    const signalTopRight = document.querySelector('.signal-top-right');
-    const signalBottomLeft = document.querySelector('.signal-bottom-left');
-    const signalBottomRight = document.querySelector('.signal-bottom-right');
+    const signalElements = {
+        L1: document.querySelector('.signal-top-left'),
+        L2: document.querySelector('.signal-top-right'),
+        L3: document.querySelector('.signal-bottom-left'),
+        L4: document.querySelector('.signal-bottom-right')
+    };
 
     const headerSignalLights = document.querySelectorAll(
         '.header-signal .signal-light'
     );
 
     function setSignalState(signalElement, color) {
-
         if (!signalElement) return;
 
         const lights = signalElement.querySelectorAll('.light');
 
         lights.forEach(light => {
-
-            if (light.classList.contains(color)) {
-                light.classList.add('active');
-            } else {
-                light.classList.remove('active');
-            }
-
+            light.classList.toggle(
+                'active',
+                light.classList.contains(color.toLowerCase())
+            );
         });
-
     }
 
-    // Traffic signal phases
+    function updateTrafficSignals(signalStates) {
+        if (!signalStates) return;
 
-    const phases = [
-        { ns: 'green', ew: 'red', duration: 6000 },
-        { ns: 'yellow', ew: 'red', duration: 2000 },
-        { ns: 'red', ew: 'green', duration: 6000 },
-        { ns: 'red', ew: 'yellow', duration: 2000 }
-    ];
+        Object.entries(signalElements).forEach(([lane, element]) => {
+            const state = signalStates[lane];
 
-    let currentPhaseIndex = 0;
+            if (state) {
+                setSignalState(element, state);
+            }
+        });
 
-    function applyTrafficPhase() {
+        if (headerSignalLights.length === 3) {
+            const states = Object.values(signalStates);
 
-        const currentPhase = phases[currentPhaseIndex];
+            let activeIndex = 0;
 
-        // North-South direction
+            if (states.includes('GREEN')) {
+                activeIndex = 2;
+            } else if (states.includes('YELLOW')) {
+                activeIndex = 1;
+            }
 
-        setSignalState(signalTopLeft, currentPhase.ns);
-        setSignalState(signalBottomRight, currentPhase.ns);
+            headerSignalLights.forEach((light, index) => {
+                light.style.opacity = index === activeIndex ? '1' : '0.4';
+            });
+        }
+    }
 
-        // East-West direction
+    // ==========================================
+    // 4. FETCH LIVE BACKEND SIGNAL STATES
+    // ==========================================
 
-        setSignalState(signalTopRight, currentPhase.ew);
-        setSignalState(signalBottomLeft, currentPhase.ew);
+    const STATUS_API = '/api/status';
 
-        currentPhaseIndex = (currentPhaseIndex + 1) % phases.length;
+    async function fetchTrafficSignals() {
+        try {
+            const response = await fetch(STATUS_API, {
+                cache: 'no-store'
+            });
 
-        setTimeout(applyTrafficPhase, currentPhase.duration);
+            if (!response.ok) {
+                throw new Error('Unable to fetch traffic status.');
+            }
 
+            const data = await response.json();
+
+            if (data.traffic && data.traffic.signal_states) {
+                updateTrafficSignals(data.traffic.signal_states);
+            }
+
+        } catch (error) {
+            console.warn('Traffic signal update failed:', error.message);
+        }
     }
 
     function initTrafficSignals() {
+        const dashboardExists = Object.values(signalElements).some(
+            element => element !== null
+        );
 
-        if (
-            signalTopLeft &&
-            signalTopRight &&
-            signalBottomLeft &&
-            signalBottomRight
-        ) {
-            applyTrafficPhase();
-        }
+        if (!dashboardExists) return;
 
-        // Header signal indicator
+        fetchTrafficSignals();
 
-        if (headerSignalLights.length === 3) {
-
-            headerSignalLights.forEach((light, index) => {
-                light.style.opacity = index === 2 ? '1' : '0.4';
-            });
-
-        }
-
+        setInterval(fetchTrafficSignals, 1000);
     }
 
     // ==========================================
-    // 4. INITIALIZATION
+    // 5. INITIALIZATION
     // ==========================================
 
     function init() {
-
         updateDateTime();
 
         setInterval(updateDateTime, 1000);
@@ -182,17 +183,12 @@
         initSidebar();
 
         initTrafficSignals();
-
     }
 
     if (document.readyState === 'loading') {
-
         document.addEventListener('DOMContentLoaded', init);
-
     } else {
-
         init();
-
     }
 
 })();

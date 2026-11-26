@@ -1,12 +1,16 @@
-
 import cv2
 import os
+import threading
+
 from pathlib import Path
 
-from detect_vehicles import detect_vehicles
-
+from detect_vehicles import (
+    detect_vehicles,
+    reset_vehicle_tracker
+)
 from lane_detection import (
     count_vehicles_per_lane,
+    identify_lane,
     LANE_ROIS
 )
 
@@ -22,13 +26,15 @@ from detect_ambulance import detect_ambulance
 from ambulance_tracker import AmbulanceTracker
 from emergency_manager import EmergencyManager
 
+
+from analytics_collector import AnalyticsCollector
+
 # ==================================================
 # 1. CONFIGURATION
 # ==================================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Video path can be configured through an environment variable.
 VIDEO_ENV = os.getenv("TRAFFIC_VIDEO_PATH")
 
 if VIDEO_ENV:
@@ -38,6 +44,8 @@ if VIDEO_ENV:
         VIDEO_PATH = BASE_DIR / VIDEO_PATH
 else:
     VIDEO_PATH = BASE_DIR / "demo_video.mp4"
+
+
 LANES = ["L1", "L2", "L3", "L4"]
 
 GREEN_DURATION = 5
@@ -49,6 +57,11 @@ DETECTION_INTERVAL = 5
 
 DISPLAY_WIDTH = 1280
 DISPLAY_HEIGHT = 720
+
+
+# ==================================================
+# 2. GREEN SIGNAL DURATION
+# ==================================================
 
 def get_green_duration(vehicle_count):
 
@@ -63,104 +76,185 @@ def get_green_duration(vehicle_count):
 
 
 # ==================================================
-# 2. INITIALIZE SYSTEM
+# 3. TRAFFIC STATE SNAPSHOT
 # ==================================================
 
-def main():
+def get_traffic_state(
+    controller,
+    lane_counts,
+    waiting_times,
+    emergency_manager,
+    frame_count
+):
+
+    return {
+        "signal_states": controller.signal_states.copy(),
+
+        "lane_counts": {
+            lane: int(count)
+            for lane, count in lane_counts.items()
+        },
+
+        "waiting_times": {
+            lane: round(float(wait), 2)
+            for lane, wait in waiting_times.items()
+        },
+
+        "current_lane": controller.current_lane,
+
+        "emergency_active": (
+            emergency_manager.is_emergency_active()
+        ),
+
+        "emergency_lane": controller.emergency_lane,
+
+        "frame_count": frame_count
+    }
+
+
+# ==================================================
+# 4. MAIN TRAFFIC PROCESSING FUNCTION
+# ==================================================
+
+def run_traffic(
+    stop_event=None,
+    frame_callback=None,
+    state_callback=None,
+    analytics_callback=None,
+    preview=False
+):
+    """
+    Run the traffic management system.
+
+    Parameters
+    ----------
+    stop_event:
+        threading.Event used to stop processing.
+
+    frame_callback:
+        Receives the resized processed video frame.
+
+    state_callback:
+        Receives the latest traffic state dictionary.
+
+    preview:
+        True enables the standalone OpenCV window.
+        False disables GUI for FastAPI execution.
+
+    Returns
+    -------
+    str:
+        "completed" or "stopped"
+    """
+
+    if stop_event is None:
+        stop_event = threading.Event()
 
     print("=" * 55)
     print(" AI BASED SMART TRAFFIC MANAGEMENT SYSTEM")
     print("=" * 55)
 
-    # Check video path
+    # ----------------------------------------------
+    # CHECK VIDEO
+    # ----------------------------------------------
+
     if not VIDEO_PATH.exists():
-        print("\nERROR: Video file not found:")
-        print(VIDEO_PATH)
-        return
+        raise FileNotFoundError(
+            f"Video file not found: {VIDEO_PATH}"
+        )
 
-    # Open video
     cap = cv2.VideoCapture(str(VIDEO_PATH))
-    VIDEO_FPS = cap.get(cv2.CAP_PROP_FPS)
-
-    if VIDEO_FPS <= 0:
-        VIDEO_FPS = 30
-
-    FRAME_DELAY = max(1, int(1000 / VIDEO_FPS))
-
-    print(f"Video FPS: {VIDEO_FPS}")
-    print(f"Frame delay: {FRAME_DELAY} ms")
-
-    if not cap.isOpened():
-        print("\nERROR: Unable to open video.")
-        return
-
-    # Initialize signal controller
-    controller = SignalController(LANES)
-        # Initialize ambulance tracking
-    ambulance_tracker = AmbulanceTracker(
-        exit_confirmation_frames=3
-    )
-
-    # Initialize emergency manager
-    emergency_manager = EmergencyManager(
-        ambulance_tracker,
-        controller,
-        yellow_duration=YELLOW_DURATION
-    )
-
-    # Reset waiting-time tracking
-    reset_waiting_times()
-
-    # Initialize all signals RED and L1 GREEN
-    controller.initialize_system()
-
-    controller.start_green_timer(GREEN_DURATION)
-
-    # Initialize lane counts
-    lane_counts = {
-        lane: 0 for lane in LANES
-    }
-
-    waiting_times = {
-        lane: 0 for lane in LANES
-    }
-
-    vehicles = []
-
-    frame_count = 0
-
-    print("\nTraffic management system started.")
-    print("Initial GREEN lane: L1")
-    print("Press Q to stop.\n")
-
-
-    # ==================================================
-    # 3. MAIN TRAFFIC MANAGEMENT LOOP
-    # ==================================================
 
     try:
 
-        while True:
+        if not cap.isOpened():
+            raise RuntimeError(
+                f"Unable to open video: {VIDEO_PATH}"
+            )
+
+        video_fps = cap.get(cv2.CAP_PROP_FPS)
+
+        if video_fps <= 0:
+            video_fps = 30
+
+        frame_delay = max(
+            1,
+            int(1000 / video_fps)
+        )
+
+        print(f"Video FPS: {video_fps}")
+        print(f"Frame delay: {frame_delay} ms")
+        analytics = AnalyticsCollector(video_fps)
+
+
+        # ------------------------------------------
+        # INITIALIZE TRAFFIC SYSTEM
+        # ------------------------------------------
+
+        controller = SignalController(LANES)
+
+        ambulance_tracker = AmbulanceTracker(
+            exit_confirmation_frames=3
+        )
+
+        emergency_manager = EmergencyManager(
+            ambulance_tracker,
+            controller,
+            yellow_duration=YELLOW_DURATION
+        )
+
+        reset_waiting_times()
+        reset_vehicle_tracker()
+
+        controller.initialize_system()
+
+        controller.start_green_timer(
+            GREEN_DURATION
+        )
+
+        lane_counts = {
+            lane: 0 for lane in LANES
+        }
+
+        waiting_times = {
+            lane: 0 for lane in LANES
+        }
+
+        vehicles = []
+
+        frame_count = 0
+
+        print("\nTraffic management system started.")
+        print("Initial GREEN lane: L1")
+
+        if preview:
+            print("Press Q to stop.\n")
+
+        # ------------------------------------------
+        # MAIN TRAFFIC MANAGEMENT LOOP
+        # ------------------------------------------
+
+        while not stop_event.is_set():
 
             ret, frame = cap.read()
 
             if not ret:
                 print("\nVideo ended.")
-                break
+                return "completed"
 
             frame_count += 1
 
-            # ------------------------------------------
-            # 3.1 EMERGENCY VEHICLE DETECTION
-            # ------------------------------------------
+            # ======================================
+            # 4.1 EMERGENCY VEHICLE DETECTION
+            # ======================================
 
             ambulances = detect_ambulance(frame)
 
             emergency_manager.update(ambulances)
 
-            # ------------------------------------------
-            # 3.1 VEHICLE DETECTION
-            # ------------------------------------------
+            # ======================================
+            # 4.2 NORMAL VEHICLE DETECTION
+            # ======================================
 
             if frame_count % DETECTION_INTERVAL == 0:
 
@@ -170,10 +264,32 @@ def main():
                     vehicles
                 )
 
+                analytics_vehicles = []
 
-            # ------------------------------------------
-            # 3.2 UPDATE WAITING TIMES
-            # ------------------------------------------
+                for vehicle in vehicles:
+
+                    analytics_vehicle = vehicle.copy()
+
+                    analytics_vehicle["lane"] = identify_lane(
+                        vehicle["center"]
+                    )
+
+                    analytics_vehicles.append(analytics_vehicle)
+
+                analytics.update_vehicles(
+                    analytics_vehicles,
+                    frame_count,
+                    lane_counts
+                )
+
+                if analytics_callback is not None:
+                    analytics_callback(
+                        analytics.get_analytics()
+                    )
+
+            # ======================================
+            # 4.3 UPDATE WAITING TIMES
+            # ======================================
 
             if controller.current_lane is not None:
 
@@ -181,10 +297,9 @@ def main():
                     controller.current_lane
                 )
 
-
-            # ------------------------------------------
-            # 3.3 UPDATE SIGNAL PHASE
-            # ------------------------------------------
+            # ======================================
+            # 4.4 UPDATE SIGNAL PHASE
+            # ======================================
 
             previous_lane = controller.current_lane
 
@@ -192,10 +307,9 @@ def main():
                 YELLOW_DURATION
             )
 
-
-            # ------------------------------------------
-            # 3.4 CHECK SIGNAL TRANSITION
-            # ------------------------------------------
+            # ======================================
+            # 4.5 CHECK SIGNAL TRANSITION
+            # ======================================
 
             if (
                 previous_lane is not None
@@ -207,34 +321,25 @@ def main():
                 print("Current GREEN phase completed.")
                 print("All signals are RED.")
 
-                # Update waiting times
                 waiting_times = update_waiting_times(
                     previous_lane
                 )
 
-
-                # --------------------------------------
-                # DISPLAY CURRENT TRAFFIC INFORMATION
-                # --------------------------------------
-
                 print("\nCurrent vehicle counts:")
 
                 for lane, count in lane_counts.items():
-
                     print(f"{lane}: {count}")
 
                 print("\nCurrent waiting times:")
 
                 for lane, wait_time in waiting_times.items():
-
                     print(
                         f"{lane}: {wait_time:.2f} seconds"
                     )
 
-
-                # --------------------------------------
-                # 3.5 SELECT NEXT LANE
-                # --------------------------------------
+                # ----------------------------------
+                # SELECT NEXT LANE
+                # ----------------------------------
 
                 next_lane = select_next_lane(
                     lane_counts,
@@ -245,43 +350,38 @@ def main():
 
                 print("\nScheduler selected:", next_lane)
 
+                # ----------------------------------
+                # ACTIVATE NEXT LANE
+                # ----------------------------------
 
-                # --------------------------------------
-                # 3.6 ACTIVATE NEXT LANE
-                # --------------------------------------
-
-                if next_lane is not None:
-
-                    green_duration = get_green_duration(
-                        lane_counts[next_lane]
+                if next_lane is None:
+                    raise RuntimeError(
+                        "Scheduler could not select a lane."
                     )
 
-                    print(
-                        f"Green time allocated to {next_lane}: "
-                        f"{green_duration} seconds"
-                    )
+                green_duration = get_green_duration(
+                    lane_counts[next_lane]
+                )
 
-                    controller.activate_next_lane(
-                        next_lane,
-                        green_duration
-                    )
+                print(
+                    f"Green time allocated to {next_lane}: "
+                    f"{green_duration} seconds"
+                )
 
-                else:
+                controller.activate_next_lane(
+                    next_lane,
+                    green_duration
+                )
 
-                    print("ERROR: No eligible lane found.")
-                    break
-
-
-            # ==================================================
-            # 4. VISUALIZATION
-            # ==================================================
+            # ======================================
+            # 4.6 CREATE DISPLAY FRAME
+            # ======================================
 
             display_frame = frame.copy()
 
-
-            # ------------------------------------------
-            # 4.1 DRAW VEHICLE BOUNDING BOXES
-            # ------------------------------------------
+            # --------------------------------------
+            # DRAW VEHICLE BOUNDING BOXES
+            # --------------------------------------
 
             for vehicle in vehicles:
 
@@ -294,7 +394,6 @@ def main():
 
                 cx, cy = int(cx), int(cy)
 
-                # Bounding box
                 cv2.rectangle(
                     display_frame,
                     (x1, y1),
@@ -303,7 +402,6 @@ def main():
                     1
                 )
 
-                # Vehicle centre
                 cv2.circle(
                     display_frame,
                     (cx, cy),
@@ -312,7 +410,6 @@ def main():
                     -1
                 )
 
-                # Vehicle label
                 label = (
                     f'{vehicle["class"]} '
                     f'{vehicle["confidence"]:.2f}'
@@ -328,15 +425,12 @@ def main():
                     1
                 )
 
-
-            
-            # ------------------------------------------
-            # 4.2 DRAW LANE ROIs AND WAITING TIMES
-            # ------------------------------------------
+            # --------------------------------------
+            # DRAW LANE ROIs AND WAITING TIMES
+            # --------------------------------------
 
             for lane, (x1, y1, x2, y2) in LANE_ROIS.items():
 
-                # Draw ROI rectangle
                 cv2.rectangle(
                     display_frame,
                     (x1, y1),
@@ -345,7 +439,6 @@ def main():
                     1
                 )
 
-                # Display lane name
                 cv2.putText(
                     display_frame,
                     lane,
@@ -356,14 +449,10 @@ def main():
                     2
                 )
 
-                # Get lane waiting time
                 wait_time = waiting_times.get(lane, 0)
 
-                # Display waiting time near ROI
                 wait_text = f"Wait: {wait_time:.1f}s"
 
-                # Green text for currently active lane,
-                # red text for waiting lanes
                 if lane == controller.current_lane:
                     wait_color = (0, 255, 0)
                 else:
@@ -379,10 +468,9 @@ def main():
                     2
                 )
 
-
-            # ------------------------------------------
-            # 4.3 DISPLAY LANE COUNTS
-            # ------------------------------------------
+            # --------------------------------------
+            # DISPLAY LANE COUNTS
+            # --------------------------------------
 
             y_position = 40
 
@@ -400,10 +488,9 @@ def main():
 
                 y_position += 35
 
-
-            # ------------------------------------------
-            # 4.4 DISPLAY SIGNAL STATES
-            # ------------------------------------------
+            # --------------------------------------
+            # DISPLAY SIGNAL STATES
+            # --------------------------------------
 
             y_position = 40
 
@@ -430,49 +517,102 @@ def main():
 
                 y_position += 35
 
-
-            # ------------------------------------------
-            # 4.5 DISPLAY VIDEO
-            # ------------------------------------------
+            # ======================================
+            # 4.7 RESIZE FRAME
+            # ======================================
 
             resized_frame = cv2.resize(
                 display_frame,
                 (DISPLAY_WIDTH, DISPLAY_HEIGHT)
             )
 
-            cv2.imshow(
-                "AI Based Smart Traffic Management System",
-                resized_frame
-            )
+            # ======================================
+            # 4.8 SEND FRAME TO CALLBACK
+            # ======================================
 
+            if frame_callback is not None:
+                frame_callback(resized_frame)
 
-            # ------------------------------------------
-            # 4.6 STOP CONDITION
-            # ------------------------------------------
+            # ======================================
+            # 4.9 SEND TRAFFIC STATE TO CALLBACK
+            # ======================================
 
-            if cv2.waitKey(FRAME_DELAY) & 0xFF == ord("q"):
+            if state_callback is not None:
 
-                print("\nSystem stopped by user.")
-                break
+                traffic_state = get_traffic_state(
+                    controller,
+                    lane_counts,
+                    waiting_times,
+                    emergency_manager,
+                    frame_count
+                )
 
+                state_callback(traffic_state)
 
-    # ==================================================
-    # 5. CLEANUP
-    # ==================================================
+            # ======================================
+            # 4.10 STANDALONE PREVIEW
+            # ======================================
+
+            if preview:
+
+                cv2.imshow(
+                    "AI Based Smart Traffic Management System",
+                    resized_frame
+                )
+
+                if cv2.waitKey(frame_delay) & 0xFF == ord("q"):
+
+                    print("\nSystem stopped by user.")
+
+                    stop_event.set()
+                    return "stopped"
+
+            else:
+
+                # Interruptible frame pacing for API execution
+                if stop_event.wait(frame_delay / 1000):
+                    break
+
+        print("\nSystem stopped.")
+
+        return "stopped"
 
     finally:
 
         cap.release()
-        cv2.destroyAllWindows()
+
+        if preview:
+            cv2.destroyAllWindows()
 
         print("\n" + "=" * 55)
         print("TRAFFIC MANAGEMENT SYSTEM STOPPED")
         print("=" * 55)
 
 
+
+
 # ==================================================
-# 6. PROGRAM ENTRY POINT
+# 5. STANDALONE PROGRAM ENTRY POINT
 # ==================================================
+
+def main():
+
+    stop_event = threading.Event()
+
+    try:
+
+        run_traffic(
+            stop_event=stop_event,
+            preview=True
+        )
+
+    except Exception as error:
+
+        print("\nTRAFFIC SYSTEM ERROR:")
+        print(error)
+
+        raise
+
 
 if __name__ == "__main__":
     main()
